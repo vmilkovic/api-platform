@@ -2,7 +2,7 @@
 
 ## Symfonycast
 
-- [] API Platform: Serious RESTful APIs
+- [ ] API Platform: Serious RESTful APIs
 
 ## Setup
 
