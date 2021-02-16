@@ -4,8 +4,12 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -16,6 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      normalizationContext={"groups"={"user:read"}},
  *      denormalizationContext={"groups"={"user:write"}},
  * )
+ * @ApiFilter(PropertyFilter::class)
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
  */
@@ -50,10 +55,22 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Groups({"user:read", "user:write"})
+     * @Groups({"user:read", "user:write", "cheese_listing:item:get", "cheese_listing:write"})
      * @Assert\NotBlank()
      */
     private $username;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CheeseListing::class, mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
+     * @Groups({"user:read", "user:write"})
+     * @Assert\Valid()
+     */
+    private $cheeseListings;
+
+    public function __construct()
+    {
+        $this->cheeseListings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -139,6 +156,36 @@ class User implements UserInterface
     public function setUsername(string $username): self
     {
         $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CheeseListing[]
+     */
+    public function getCheeseListings(): Collection
+    {
+        return $this->cheeseListings;
+    }
+
+    public function addCheeseListing(CheeseListing $cheeseListing): self
+    {
+        if (!$this->cheeseListings->contains($cheeseListing)) {
+            $this->cheeseListings[] = $cheeseListing;
+            $cheeseListing->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCheeseListing(CheeseListing $cheeseListing): self
+    {
+        if ($this->cheeseListings->removeElement($cheeseListing)) {
+            // set the owning side to null (unless already changed)
+            if ($cheeseListing->getOwner() === $this) {
+                $cheeseListing->setOwner(null);
+            }
+        }
 
         return $this;
     }
