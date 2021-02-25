@@ -20,4 +20,5 @@ api_platform:
                 - text/html
         jsonhal:
             mime_types:
-                - aplication/hal+js
+                - application/hal+json
+                
