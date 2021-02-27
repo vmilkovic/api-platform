@@ -17,12 +17,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *      collectionOperations={"get", "post"},
  *      itemOperations={
  *          "get"={
  *              "normalization_context"={"groups"={"cheese_listing:read", "cheese_listing:item:get"}}
  *          }, 
- *          "put"
+ *          "put" = {"security" = "is_granted('ROLE_USER')"},
+ *          "delete" = {"security" = "is_granted('ROLE_ADMIN')"}
+ *      },
+ *      collectionOperations={
+ *          "get", 
+ *          "post" = {"security" = "is_granted('ROLE_USER')"}
  *      },
  *      normalizationContext={"groups"={"cheese_listing:read"}, "swagger_definition_name"="Read"},
  *      denormalizationContext={"groups"={"cheese_listing:write"}, "swagger_definition_name"="Write"},
@@ -123,11 +127,11 @@ class CheeseListing
      */
     public function getShortDescription(): ?string
     {
-        if(strlen($this->description) < 40){
+        if (strlen($this->description) < 40) {
             return $this->description;
         }
 
-        return substr($this->description, 0, 40).'...';
+        return substr($this->description, 0, 40) . '...';
     }
 
     public function setDescription(string $description): self
@@ -172,7 +176,8 @@ class CheeseListing
      * 
      * @Groups({"cheese_listing:read"})
      */
-    public function getCreatedAtAgo(): string {
+    public function getCreatedAtAgo(): string
+    {
         return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
