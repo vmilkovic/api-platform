@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -20,7 +21,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      security="is_granted('ROLE_USER')" ,
  *      collectionOperations={
  *          "get",
- *          "post" = { "security" = "is_granted('IS_AUTHENTICATED_ANONYMOUSLY')" },
+ *          "post" = { 
+ *              "security" = "is_granted('IS_AUTHENTICATED_ANONYMOUSLY')",
+ *              "validation_groups" = { "Default", "create" }
+ *          },
  *      },
  *      itemOperations={
  *          "get",
@@ -59,9 +63,15 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
-     * @Groups({"user:write"})
      */
     private $password;
+
+    /**
+     * @Groups({"user:write"})
+     * @SerializedName("password")
+     * @Assert\NotBlank(groups={"create"})
+     */
+    private $plainPassword;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
@@ -160,7 +170,7 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function setUsername(string $username): self
@@ -196,6 +206,26 @@ class User implements UserInterface
                 $cheeseListing->setOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Get the value of plainPassword
+     */ 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * Set the value of plainPassword
+     *
+     * @return  self
+     */ 
+    public function setPlainPassword($plainPassword)
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }

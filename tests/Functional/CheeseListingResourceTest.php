@@ -33,10 +33,11 @@ class CheeseListingResourceTest extends CustomApiTestCase {
         $user1 = $this->createUser('user1@example.com', 'foo');
         $user2 = $this->createUser('user2@example.com', 'foo');
 
-        $cheeseListing = new CheeseListing('Block of cheedar');
+        $cheeseListing = new CheeseListing('Block of cheddar');
         $cheeseListing->setOwner($user1);
         $cheeseListing->setPrice(1000);
         $cheeseListing->setDescription('mmmm');
+        $cheeseListing->setIsPublished(true);
 
         $em = $this->getEntityManager();
         $em->persist($cheeseListing);
