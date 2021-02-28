@@ -49,8 +49,9 @@ class UserResourceTest extends CustomApiTestCase {
 
     public function testGetUser(){
         $client = self::createClient();
-        $user = $this->createUserAndLogIn($client, 'cheeseplease@example.com', 'foo');
-        
+        $user = $this->createUser('cheeseplease@example.com', 'foo');
+        $this->createUserAndLogIn($client, 'autheticated@example.com', 'bar');
+
         $user->setPhoneNumber('123.4567.89');
         $em = $this->getEntityManager();
         $em->flush();
