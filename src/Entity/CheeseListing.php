@@ -3,17 +3,18 @@
 namespace App\Entity;
 
 use Carbon\Carbon;
+use App\Validator\IsValidOwner;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use App\Repository\CheeseListingRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\SerializedName;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ApiResource(
@@ -37,7 +38,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}}
  *      }
  * )
- * @ORM\Entity(repositoryClass=CheeseListingRepository::class)
  * @ApiFilter(BooleanFilter::class, properties={"isPublished"})
  * @ApiFilter(SearchFilter::class, properties={
  *      "title": "partial", 
@@ -47,6 +47,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * })
  * @ApiFilter(RangeFilter::class, properties={"price"})
  * @ApiFilter(PropertyFilter::class)
+ * @ORM\Entity(repositoryClass=CheeseListingRepository::class)
+ * @ORM\EntityListeners({"App\Doctrine\CheeseListingSetOwnerListener"})
  */
 class CheeseListing
 {
@@ -97,8 +99,8 @@ class CheeseListing
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="cheeseListings")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"cheese:read", "cheese:write"})
-     * @Assert\Valid()
+     * @Groups({"cheese:read", "cheese:collection:post"})
+     * @IsValidOwner()
      */
     private $owner;
 
