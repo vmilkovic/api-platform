@@ -84,4 +84,57 @@ class CheeseListingResourceTest extends CustomApiTestCase {
 
         $this->assertResponseStatusCodeSame(200);
     }
+
+    public function testGetCheeseListingCollection(){
+        $client = self::createClient();
+        $user = $this->createUser('cheeseplease@example.com', 'bar');
+        
+        $cheeseListing1 = new CheeseListing('cheese1');
+        $cheeseListing1->setOwner($user);
+        $cheeseListing1->setPrice(1000);
+        $cheeseListing1->setDescription('cheese1');
+
+        $cheeseListing2 = new CheeseListing('cheese2');
+        $cheeseListing2->setOwner($user);
+        $cheeseListing2->setPrice(2000);
+        $cheeseListing2->setDescription('cheese2');
+        $cheeseListing2->setIsPublished(true);
+
+        $cheeseListing3 = new CheeseListing('cheese3');
+        $cheeseListing3->setOwner($user);
+        $cheeseListing3->setPrice(3000);
+        $cheeseListing3->setDescription('cheese3');
+        $cheeseListing3->setIsPublished(true);
+
+        $em = $this->getEntityManager();
+        $em->persist($cheeseListing1);
+        $em->persist($cheeseListing2);
+        $em->persist($cheeseListing3);
+        $em->flush();
+
+        $client->request('GET', '/api/cheeses');
+        $this->assertJsonContains(['hydra:totalItems' => 2]);
+    }
+
+    public function testGetCheeseListingItem(){
+        $client = self::createClient();
+        $user = $this->createUserAndLogIn($client, 'cheeseplease@example.com', 'bar');
+        
+        $cheeseListing = new CheeseListing('cheese');
+        $cheeseListing->setOwner($user);
+        $cheeseListing->setPrice(1000);
+        $cheeseListing->setDescription('cheese');
+        $cheeseListing->setIsPublished(false);
+
+        $em = $this->getEntityManager();
+        $em->persist($cheeseListing);
+        $em->flush();
+
+        $client->request('GET', '/api/cheeses/'.$cheeseListing->getId());
+        $this->assertResponseStatusCodeSame(404);
+
+        $client->request('GET', '/api/users/'.$user->getId());
+        $data = $client->getResponse()->toArray();
+        $this->assertEmpty($data['cheeseListings']);
+    }
 }
