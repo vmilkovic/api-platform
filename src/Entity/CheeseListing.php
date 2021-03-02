@@ -23,7 +23,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *              "normalization_context"={"groups"={"cheese:read", "cheese:item:get"}}
  *          }, 
  *          "put"={
- *              "access_control"="is_granted('EDIT', previous_object)",
+ *              "security"="is_granted('EDIT', object)",
  *              "security_message"="Only the creator can edit a cheese listing"
  *          },
  *          "delete" = {"security" = "is_granted('ROLE_ADMIN')"}
