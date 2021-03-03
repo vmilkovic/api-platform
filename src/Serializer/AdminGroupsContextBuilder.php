@@ -25,7 +25,7 @@ final class AdminGroupsContextBuilder implements SerializerContextBuilderInterfa
 
         $isAdmin = $this->authorizationChecker->isGranted('ROLE_ADMIN');
 
-        if( $context['groups'] && $isAdmin ){
+        if ($isAdmin) {
             $context['groups'][] = $normalization ? 'admin:read' : 'admin:write';
         }
 
