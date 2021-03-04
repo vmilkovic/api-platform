@@ -5,6 +5,7 @@ namespace App\Entity;
 use Carbon\Carbon;
 use App\Validator\IsValidOwner;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validator\ValidIsPublished;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use App\Repository\CheeseListingRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -49,6 +50,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=CheeseListingRepository::class)
  * @ORM\EntityListeners({"App\Doctrine\CheeseListingSetOwnerListener"})
+ * @ValidIsPublished()
  */
 class CheeseListing
 {
