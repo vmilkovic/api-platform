@@ -33,12 +33,7 @@ class UserNormalizer implements ContextAwareNormalizerInterface, CacheableSuppor
 
         $context[self::ALREDY_CALLED] = true;
 
-        $data = $this->normalizer->normalize($object, $format, $context);
-        
-        // Here: add, edit, or delete some data
-        $data['isMe'] = $isOwner;
-
-        return $data;
+        return $this->normalizer->normalize($object, $format, $context);
     }
 
     public function supportsNormalization($data, $format = null, array $context = []): bool
