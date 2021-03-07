@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use App\Doctrine\UserSetIsMvpListener;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -36,6 +37,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ApiFilter(PropertyFilter::class)
  * @UniqueEntity(fields={"username"})
  * @UniqueEntity(fields={"email"})
+ * @ORM\EntityListeners({UserSetIsMvpListener::class})
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
 class User implements UserInterface
@@ -98,7 +100,13 @@ class User implements UserInterface
      * Return true if this is the currently-authenticated user
      * @Groups({"user:read"})
      */
-    private $isMe;
+    private $isMe = false;
+
+    /**
+     * Return true if this user is an MVP
+     * @Groups({"user:read"})
+     */
+    private $isMvp = false;
 
     public function __construct()
     {
@@ -271,20 +279,30 @@ class User implements UserInterface
      */ 
     public function getIsMe(): ?bool
     {
-        if ($this->isMe === null) {
-            throw new \LogicException('The isMe field has not been initialized');
-        }
-
         return $this->isMe;
     }
 
     /**
      * Set the value of isMe
-     *
-     * @return  self
      */ 
     public function setIsMe(bool $isMe)
     {
         $this->isMe = $isMe;
+    }
+
+    /**
+     * Get return true if this is an MVP
+     */ 
+    public function getIsMvp()
+    {
+        return $this->isMvp;
+    }
+
+    /**
+     * Set return true if this is an MVP
+     */ 
+    public function setIsMvp($isMvp)
+    {
+        $this->isMvp = $isMvp;
     }
 }
