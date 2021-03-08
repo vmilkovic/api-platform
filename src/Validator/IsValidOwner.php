@@ -13,7 +13,7 @@ class IsValidOwner extends Constraint
      * Any public properties become valid options for the annotation.
      * Then, use these in your validator class.
      */
-    public $message = 'Cannot set owner to a different user.';
+    public $message = 'Cannot set owner to a different user';
 
-    public $anonymousMessage = 'Cannot se owner unless you are atuheticated';
+    public $anonymousMessage = 'Cannot set owner unless you are atuheticated';
 }

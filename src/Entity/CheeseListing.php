@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Validator\IsValidOwner;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validator\ValidIsPublished;
+use App\ApiPlatform\CheeseSearchFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use App\Repository\CheeseListingRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -46,6 +47,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *      "owner": "exact",
  *      "owner.username": "partial"
  * })
+ * @ApiFilter(CheeseSearchFilter::class, arguments={"useLike"=true})
  * @ApiFilter(RangeFilter::class, properties={"price"})
  * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=CheeseListingRepository::class)

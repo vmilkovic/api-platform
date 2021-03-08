@@ -212,6 +212,7 @@ class User implements UserInterface
     /**
      * @Groups({"user:read"})
      * @SerializedName("cheeseListings")
+     * @return Collection<CheeseListing>
      */
     public function getPublishedCheeseListings(): Collection
     {
