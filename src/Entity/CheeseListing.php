@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Carbon\Carbon;
 use App\Validator\IsValidOwner;
+use App\Dto\CheeseListingOutput;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validator\ValidIsPublished;
 use App\ApiPlatform\CheeseSearchFilter;
@@ -20,6 +21,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ApiResource(
+ *      output=CheeseListingOutput::CLASS,
  *      itemOperations={
  *          "get"={
  *              "normalization_context"={"groups"={"cheese:read", "cheese:item:get"}}
@@ -47,7 +49,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *      "owner": "exact",
  *      "owner.username": "partial"
  * })
- * @ApiFilter(CheeseSearchFilter::class, arguments={"useLike"=true})
+ * @ApiFilter(CheeseSearchFilter::class)
  * @ApiFilter(RangeFilter::class, properties={"price"})
  * @ApiFilter(PropertyFilter::class)
  * @ORM\Entity(repositoryClass=CheeseListingRepository::class)
@@ -65,7 +67,7 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"cheese:read", "cheese:write", "user:read", "user:write"})
+     * @Groups({"cheese:write", "user:write"})
      * @Assert\NotBlank()
      * @Assert\Length(
      *      min=2,
@@ -77,7 +79,6 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"cheese:read"})
      */
     private $description;
 
@@ -85,7 +86,7 @@ class CheeseListing
      * The price of this delicious chese, in cents.
      * 
      * @ORM\Column(type="integer")
-     * @Groups({"cheese:read", "cheese:write", "user:read", "user:write"})
+     * @Groups({"cheese:write","user:write"})
      * @Assert\NotBlank()
      */
     private $price;
@@ -177,16 +178,6 @@ class CheeseListing
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
-    }
-
-    /**
-     * How long ago in text that this cheese listing was added.
-     * 
-     * @Groups({"cheese:read"})
-     */
-    public function getCreatedAtAgo(): string
-    {
-        return Carbon::instance($this->getCreatedAt())->diffForHumans();
     }
 
     public function getIsPublished(): ?bool
