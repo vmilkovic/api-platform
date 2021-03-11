@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Carbon\Carbon;
+use App\Entity\User;
+use App\Dto\CheeseListingInput;
 use App\Validator\IsValidOwner;
 use App\Dto\CheeseListingOutput;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,10 +13,8 @@ use App\ApiPlatform\CheeseSearchFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use App\Repository\CheeseListingRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\SerializedName;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
@@ -22,6 +22,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 /**
  * @ApiResource(
  *      output=CheeseListingOutput::CLASS,
+ *      input=CheeseListingInput::CLASS,
  *      itemOperations={
  *          "get"={
  *              "normalization_context"={"groups"={"cheese:read", "cheese:item:get"}}
@@ -67,7 +68,6 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"cheese:write", "user:write"})
      * @Assert\NotBlank()
      * @Assert\Length(
      *      min=2,
@@ -86,7 +86,6 @@ class CheeseListing
      * The price of this delicious chese, in cents.
      * 
      * @ORM\Column(type="integer")
-     * @Groups({"cheese:write","user:write"})
      * @Assert\NotBlank()
      */
     private $price;
@@ -98,14 +97,13 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"cheese:write"})
      */
     private $isPublished = false;
 
     /**
+     * @var User
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="cheeseListings")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"cheese:read", "cheese:collection:post"})
      * @IsValidOwner()
      */
     private $owner;
@@ -131,34 +129,9 @@ class CheeseListing
         return $this->description;
     }
 
-    /**
-     * @Groups("cheese:read")
-     */
-    public function getShortDescription(): ?string
-    {
-        if (strlen($this->description) < 40) {
-            return $this->description;
-        }
-
-        return substr($this->description, 0, 40) . '...';
-    }
-
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * The description of the cheese as raw text.
-     * 
-     * @Groups({"cheese:write", "user:write"})
-     * @SerializedName("description")
-     */
-    public function setTextDescription(string $description): self
-    {
-        $this->description = nl2br($description);
 
         return $this;
     }
