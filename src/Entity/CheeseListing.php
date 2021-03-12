@@ -40,7 +40,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *      shortName="cheese",
  *      attributes={
  *          "pagination_items_per_page"=10,
- *          "formats"={"jsonld", "json", "html", "jsonhal", "csv"={"text/csv"}}
+ *          "formats"={"jsonld", "html", "jsonhal", "csv"={"text/csv"}}
  *      }
  * )
  * @ApiFilter(BooleanFilter::class, properties={"isPublished"})
@@ -68,12 +68,6 @@ class CheeseListing
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank()
-     * @Assert\Length(
-     *      min=2,
-     *      max=50,
-     *      maxMessage="Describe your cheese in 50 chars or less"
-     * )
      */
     private $title;
 
@@ -86,7 +80,6 @@ class CheeseListing
      * The price of this delicious chese, in cents.
      * 
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank()
      */
     private $price;
 
@@ -104,7 +97,6 @@ class CheeseListing
      * @var User
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="cheeseListings")
      * @ORM\JoinColumn(nullable=false)
-     * @IsValidOwner()
      */
     private $owner;
 

@@ -10,6 +10,7 @@ use App\Entity\CheeseListing;
 
 class CheeseListingInputDataTransformer implements DataTransformerInterface
 {
+
     private $validator;
 
     public function __construct(ValidatorInterface $validator)
@@ -22,7 +23,8 @@ class CheeseListingInputDataTransformer implements DataTransformerInterface
      */
     public function transform($input, string $to, array $context = [])
     {
-        
+        $this->validator->validate($input);
+
         $cheeseListing = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? null;
 
         return $input->createOrUpdateEntity($cheeseListing);

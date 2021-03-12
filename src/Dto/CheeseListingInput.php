@@ -4,7 +4,11 @@ namespace App\Dto;
 
 use App\Entity\User;
 use App\Entity\CheeseListing;
+use App\Validator\IsValidOwner;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 class CheeseListingInput
@@ -12,18 +16,26 @@ class CheeseListingInput
     /**
      * @var string
      * @Groups({"cheese:write", "user:write"})
+     * @Assert\NotBlank()
+     * @Assert\Length(
+     *      min=2,
+     *      max=50,
+     *      maxMessage="Describe your cheese in 50 chars or less"
+     * )
      */
     public $title;
 
     /**
      * @var int
      * @Groups({"cheese:write","user:write"})
+     * @Assert\NotBlank()
      */
     public $price; 
     
     /**
      * @var User
      * @Groups({"cheese:collection:post"})
+     * @IsValidOwner()
      */
     public $owner;
 
@@ -32,7 +44,10 @@ class CheeseListingInput
      * @Groups({"cheese:write"})
      */
     public $isPublished = false;
-
+    
+    /**
+     * @Assert\NotBlank()
+     */
     public $description;
 
     /**

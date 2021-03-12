@@ -5,6 +5,7 @@ namespace App\Tests\Functional;
 use App\Entity\User;
 use App\Factory\UserFactory;
 use App\Test\CustomApiTestCase;
+use Ramsey\Uuid\Uuid;
 
 class UserResourceTest extends CustomApiTestCase
 {
@@ -21,6 +22,12 @@ class UserResourceTest extends CustomApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(201);
 
+        $user = UserFactory::repository()->findOneBy(['email' => 'cheeseplease@example.com']);
+        $this->assertNotNull($user);
+        $this->assertJsonContains([
+            '@id' => '/api/users/'.$user->getUuid()->toString()
+        ]);
+
         $this->logIn($client, 'cheeseplease@example.com', 'brie');
     }
 
@@ -30,7 +37,7 @@ class UserResourceTest extends CustomApiTestCase
         $user = UserFactory::new()->create();
         $this->logIn($client, $user);
 
-        $client->request('PUT', '/api/users/'.$user->getId(), [
+        $client->request('PUT', '/api/users/'.$user->getUuid(), [
             'json' => [
                 'username' => 'newusername',
                 'roles' => ['ROLE_ADMIN'] // will be ignored
@@ -55,7 +62,7 @@ class UserResourceTest extends CustomApiTestCase
         $authenticatedUser = UserFactory::new()->create();
         $this->logIn($client, $authenticatedUser);
 
-        $client->request('GET', '/api/users/'.$user->getId());
+        $client->request('GET', '/api/users/'.$user->getUuid());
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
             'username' => $user->getUsername(),
@@ -74,10 +81,31 @@ class UserResourceTest extends CustomApiTestCase
         $user->save();
         $this->logIn($client, $user);
 
-        $client->request('GET', '/api/users/'.$user->getId());
+        $client->request('GET', '/api/users/'.$user->getUuid());
         $this->assertJsonContains([
             'phoneNumber' => '555.123.4567',
             'isMe' => true,
+        ]);
+    }
+
+    public function testCreateUserWithUuid()
+    {
+        $client = self::createClient();
+
+        $uuid = Uuid::uuid4();
+
+        $client->request('POST', '/api/users', [
+            'json' => [
+                'uuid' => $uuid,
+                'email' => 'cheeseplease@example.com',
+                'username' => 'cheeseplease',
+                'password' => 'brie'
+            ]
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        $this->assertJsonContains([
+            '@id' => '/api/users/'.$uuid
         ]);
     }
 }
