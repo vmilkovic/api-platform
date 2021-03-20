@@ -4,7 +4,7 @@
 
 - [x] API Platform: Serious RESTful APIs
 - [x] API Platform Part 2: Security
-- [ ] API Platform Part 3: Custom Resources
+- [x] API Platform Part 3: Custom Resources
 
 ## Setup
 
